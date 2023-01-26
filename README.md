@@ -2,6 +2,13 @@
 
 <img src="images/result.gif" width=100% height=250>
 
+## Abstract
+This project uses YOLOv7 algorithm to detect object and estimate huamn pose. A test video has been given in the format of google file id. Detection and huamn pose data will be saved in the format of json and will be saved in the output folder.
+
+If need to change another video, delete input folder videos and put new video under input folder. Note could solve multiple videos.
+
+Note: For plot_json file, only one person video can be plot.
+
 ## Getting Started
 Clone the repository.
 
