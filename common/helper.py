@@ -1,11 +1,12 @@
-import cv2
-from typing import Generator, List, Optional, Tuple
-import matplotlib.pyplot as plt
-import numpy as np
 import os
-from typing import Union
+import cv2
 import json
 import wget
+import yaml
+import numpy as np
+from typing import Union
+import matplotlib.pyplot as plt
+from typing import Generator, List, Optional, Tuple
 from .instance import Rect, Color, VideoConfig, FrameData, Pose, Detection, Point
 
 current_path = os.path.dirname(os.path.realpath(__file__))
@@ -122,3 +123,8 @@ def calibrate(
     pose.y = (pose.y - y_shift) * 1000 / baseline_pose_height
     #ball_y = (ball_y - y_shift) * 1000 / baseline_pose_height
     return pose
+
+def load_config(configFilePath):
+    with open(configFilePath, 'r') as file:
+        cfg = yaml.safe_load(file)
+    return cfg

@@ -1,29 +1,25 @@
 import os
-from yolov7.utils.general import check_img_size, non_max_suppression_kpt, non_max_suppression
+import torch
+import gdown
+import argparse
+import numpy as np
+from tqdm import tqdm
+from typing import Tuple
+from torchvision import transforms
+from common import helper, instance
+from yolov7.utils.general import non_max_suppression_kpt, non_max_suppression
 from yolov7.utils.plots import output_to_keypoint, plot_skeleton_kpts
 from yolov7.models.experimental import attempt_load
 from yolov7.utils.datasets import letterbox
-import torch
-from torchvision import transforms
-from common import helper, instance
-import numpy as np
-from typing import Tuple
-import gdown
-from tqdm import tqdm
-
 import warnings
 warnings.filterwarnings("ignore")
 
-# Common Setting
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print("device: ", device)
 current_path = os.path.dirname(os.path.realpath(__file__))
 # parent_path = os.path.abspath(os.path.join(current_path, os.pardir))
 
 # Presetting
 DETECTION_MODEL_WEIGHTS_PATH = os.path.join(current_path, "weights", "yolov7-e6e.pt")
 POSE_MODEL_WEIGHTS_PATH = os.path.join(current_path, "weights", "yolov7-w6-pose.pt")
-
 
 DETECTION_IMAGE_SIZE = 1920
 POSE_IMAGE_SIZE = 960
@@ -139,7 +135,6 @@ def detect_annotate(image: np.ndarray, detections: np.ndarray, color: instance.C
             height=float(y_max - y_min)
         )
         annotated_image = helper.draw_rect(image=annotated_image, rect=rect, color=color, thickness=thickness)
-    
     return annotated_image
 
 
@@ -152,106 +147,80 @@ def pose_annotate(image: np.ndarray, detections: np.ndarray) -> np.ndarray:
 
     return annotated_frame
 
-def process_frame_and_annotate(frame: np.ndarray, pose_model) -> np.ndarray:
-    pose_pre_processed_frame = pose_pre_process_frame(frame=frame.copy(), device=device)
-    
-    image_size = frame.shape[:2]
-    scaled_image_size = tuple(pose_pre_processed_frame.size())[2:]
-    
-    with torch.no_grad():
-        # Human pose detection
-        pose_output, _ = pose_model(pose_pre_processed_frame)
-        pose_output = pose_post_process_output(
-            output=pose_output,
-            confidence_trashold=CONFIDENCE_TRESHOLD, 
-            iou_trashold=IOU_TRESHOLD,
-            image_size=image_size,
-            scaled_image_size=scaled_image_size,
-            pose_model=pose_model
-        )
 
-    annotated_frame = pose_annotate(image=frame, detections=pose_output)
-
-    return annotated_frame
-
-def download_weights():
+def download_weights(yolov7_e6e_url, yolov7_w6_pose_url):
     # download weights
     weights_path = os.path.join(current_path, "weights")
     if not os.path.exists(weights_path):
         os.makedirs(weights_path)
     
     if not os.path.exists(os.path.join(weights_path, "yolov7-e6e.pt")):
-        yolov7_e6e_url = "https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-e6e.pt"
         helper.download_file(yolov7_e6e_url, weights_path)
 
     if not os.path.exists(os.path.join(weights_path, "yolov7-w6-pose.pt")):
-        yolov7_w6_pose_url = "https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-w6-pose.pt"
         helper.download_file(yolov7_w6_pose_url, weights_path)
 
-def download_video_from_gdrive(file_id, file_name):
+def download_video_from_gdrive(cfg):
     # create video input path
     video_input_path = os.path.join(current_path, "input")
-    output = os.path.join(video_input_path, file_name)
+    output = os.path.join(video_input_path, cfg['video_name'])
     if not os.path.exists(video_input_path):
         os.makedirs(video_input_path)
-
         # get video absolute path
-        gdown.download(id = file_id, output = output, quiet=False)
+        gdown.download(id = cfg['test_video_google_download_id'], output = output, quiet=False)
     
     return [os.path.join(video_input_path, video) for video in os.listdir(video_input_path)]
 
-def train():
+def run(cfg):
     # download test video
-    google_drive_video_id = "1E2TbvkUc-I2-FhNqww6DvWkVoaVyPIes"
-    video_name = "test_video.mp4"
-    SOURCE_VIDEO_PATH = download_video_from_gdrive(google_drive_video_id, video_name)
-
-    # download weights
-    download_weights()
-
+    SOURCE_VIDEO_PATH = download_video_from_gdrive(cfg)
+    # download yolov7 detection and pose estimation weights
+    download_weights(cfg['yolov7_e6e_url'], cfg['yolov7_w6_pose_url'])
+    
     # create output directory
     output_path = os.path.join(current_path, "output")
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
     # object detection model
-    detection_model = attempt_load(weights=DETECTION_MODEL_WEIGHTS_PATH, map_location=device)
+    detection_model = attempt_load(weights=DETECTION_MODEL_WEIGHTS_PATH, map_location=cfg['device'])
 
     # human pose estimation model
-    weigths = torch.load(POSE_MODEL_WEIGHTS_PATH, map_location=device)
+    weigths = torch.load(POSE_MODEL_WEIGHTS_PATH, map_location=cfg['device'])
     pose_model = weigths["model"] # get pose models
     _ = pose_model.float().eval()
     if torch.cuda.is_available():
     # move pose_model to device
-        pose_model.half().to(device)
+        pose_model.half().to(cfg['device'])
         
     for video_path in tqdm(SOURCE_VIDEO_PATH, desc="video"):
         # get video name
         video_name = os.path.split(video_path)[1].split(".")[0]
+        print("#"*10, "processing video:", video_name, "#"*10)
         # output video path
         target_video_path = os.path.join(output_path, os.path.split(video_path)[1])
         target_json_path = os.path.join(output_path, video_name + ".json")
         # get the number of video frames
         video_frame_num = helper.get_frame_count(video_path)
         # initiate video writer
-        video_config = instance.VideoConfig(fps=25, width=1920, height=1080)
+        video_config = instance.VideoConfig(fps=cfg['fps'], width=cfg['width'], height=cfg['height'])
         # create video writer
         video_writer = helper.get_video_writer(target_video_path=target_video_path,  video_config=video_config)
         # get frame iterator, convert video into frames
         frame_iterator = iter(helper.generate_frames(video_file=video_path))
-        COLOR = instance.Color(r=255, g=255, b=255)
+        COLOR = instance.Color(r=0, g=0, b=255)
 
         # save json file
         entries = []
         
         # get the one of frames
-        for frame in tqdm(frame_iterator, total=video_frame_num, desc="process frame"):
+        for frame in tqdm(frame_iterator, total=video_frame_num, desc="process frames"):
             annotated_frame = frame.copy()
             with torch.no_grad():
                 # get image size
                 image_size = frame.shape[:2]
                 # detection
-                detection_pre_processed_frame = detection_pre_process_frame(frame=frame, device=device)
+                detection_pre_processed_frame = detection_pre_process_frame(frame=frame, device=cfg['device'])
                 detection_scaled_image_size = tuple(detection_pre_processed_frame.size())[2:]
                 detection_output = detection_model(detection_pre_processed_frame)[0].detach().cpu()
                 detection_output = detection_post_process_output(
@@ -264,7 +233,7 @@ def train():
                 annotated_frame = detect_annotate(image=annotated_frame, detections=detection_output, color=COLOR)
 
                 # pose
-                pose_pre_processed_frame = pose_pre_process_frame(frame=frame, device=device)
+                pose_pre_processed_frame = pose_pre_process_frame(frame=frame, device=cfg['device'])
                 pose_scaled_image_size = tuple(pose_pre_processed_frame.size())[2:]
 
                 pose_output = pose_model(pose_pre_processed_frame)[0].detach().cpu()
@@ -293,8 +262,24 @@ def train():
         video_writer.release()
         # save json file
         helper.dump_json_file(file_path=target_json_path, content=entries)
+        
+
+def parse_opt():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--device', type=str, default='gpu', help='cpu/0,1,2,3(gpu)')   #device arugments
+    opt = parser.parse_args()
+    return opt
+
 
 if __name__ == "__main__":
-    # this is a test yes!!
-    train()
+    opt = parse_opt()
+    configFilePath = os.path.join(current_path, "config/cfg.yaml")
+    cfg = helper.load_config(configFilePath)
+    cfg['device'] = opt.device
+    # set device
+    if opt.device == "gpu":
+        cfg['device'] = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        print("device:", cfg['device'])
+        
+    run(cfg)
 

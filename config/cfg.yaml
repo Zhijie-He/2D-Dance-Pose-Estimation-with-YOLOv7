@@ -1,0 +1,9 @@
+test_video_google_download_id: 1E2TbvkUc-I2-FhNqww6DvWkVoaVyPIes
+video_name: test_video.mp4
+yolov7_e6e_url: https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-e6e.pt
+yolov7_w6_pose_url: https://github.com/WongKinYiu/yolov7/releases/download/v0.1/yolov7-w6-pose.pt
+
+fps: 25.0
+width: 1920
+height: 1080
+
