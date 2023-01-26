@@ -56,3 +56,8 @@ Plot human pose with json file using matplotlib
 python plot_json.py
 ```
 <img src="images/result.gif" width=100% height=250>
+
+
+## Reference
+- https://github.com/WongKinYiu/yolov7
+- https://github.com/SkalskiP/sport
