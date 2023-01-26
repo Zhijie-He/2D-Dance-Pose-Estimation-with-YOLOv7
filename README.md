@@ -14,7 +14,7 @@ Go to the cloned folder.
 cd 2D-Dance-Pose-Estimation-with-YOLOv7
 ```
 ## Steps to run Code
-
+Create virtual environment
 ```
 ### For Linux Users
 python3 -m venv yolov7_dance
@@ -28,8 +28,22 @@ activate
 cd ..
 cd ..
 ```
-
+### Installation
 Install requirements with mentioned command below.
 ```
 pip install -r requirements.txt
+```
+
+### Object detection and huamn pose estimation
+In the configuration file (config/cfg.yaml), a test video has been gived which can be downloaded by gdown. 
+Run the code
+```
+python main.py --device [gpu/cpu]
+```
+The object dection and huamn pose estimation data will be saved in output file with the json format.
+<img src="images/object_human_pose_estimation.gif" width=100% height=250>
+
+Plot human pose with json file using matplotlib
+```
+python plot_json.py
 ```
