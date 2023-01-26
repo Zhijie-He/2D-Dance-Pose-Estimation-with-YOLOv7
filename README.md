@@ -36,6 +36,7 @@ pip install -r requirements.txt
 
 ### Object detection and huamn pose estimation
 In the configuration file (config/cfg.yaml), a test video has been gived which can be downloaded by gdown. 
+
 Run the code
 ```
 python main.py --device [gpu/cpu]
@@ -47,3 +48,4 @@ Plot human pose with json file using matplotlib
 ```
 python plot_json.py
 ```
+<img src="images/result.gif" width=100% height=250>
