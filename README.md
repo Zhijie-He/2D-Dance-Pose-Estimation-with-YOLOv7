@@ -2,6 +2,7 @@
 
 - 2D Dance pose Estimation using Yolov7
 <img src="images/result_2d.gif" width=100% height=250>
+
 - 3D Dance pose Estimation using Mediapipe
 <img src="images/result_3d.gif" width=100% height=250>
 
