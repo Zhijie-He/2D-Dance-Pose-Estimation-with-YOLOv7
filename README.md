@@ -1,8 +1,8 @@
 # 💃 2D and 3D Dance Pose Estimation 
 
-2D Dance pose Estimation using Yolov7
+- 2D Dance pose Estimation using Yolov7
 <img src="images/result_2d.gif" width=100% height=250>
-3D Dance pose Estimation using Mediapipe
+- 3D Dance pose Estimation using Mediapipe
 <img src="images/result_3d.gif" width=100% height=250>
 
 ## Abstract
@@ -54,7 +54,7 @@ python main.py --device [gpu/cpu] --dim [2D/3D]
 - dim {2D,3D}    choose to extract 2D or 3D huamn pose data, default 3D
 
 The huamn pose estimation data will be saved in output file with the json format.
-<img src="images/object_human_pose_estimation.gif" width=100% height=250>
+
 Plot human pose with json file using matplotlib
 
 <img src="images/result_2d.gif" width=100% height=250>
