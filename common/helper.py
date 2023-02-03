@@ -128,3 +128,11 @@ def load_config(configFilePath):
     with open(configFilePath, 'r') as file:
         cfg = yaml.safe_load(file)
     return cfg
+
+def makedirs(path):
+    # Check whether the specified path exists or not
+    isExist = os.path.exists(path)
+    if not isExist:
+        # Create a new directory because it does not exist
+        os.makedirs(path)
+        print(f"The new directory {os.path.split(path)[1]} is created!")
