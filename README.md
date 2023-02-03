@@ -1,13 +1,15 @@
-# 💃 2D Dance Pose Estimation with YOLOv7
+# 💃 2D and 3D Dance Pose Estimation 
 
-<img src="images/result.gif" width=100% height=250>
+2D Dance pose Estimation using Yolov7
+<img src="images/result2d.gif" width=100% height=250>
+3D Dance pose Estimation using Mediapipe
+<img src="images/result3d.gif" width=100% height=250>
 
 ## Abstract
-This project uses YOLOv7 algorithm to detect object and estimate huamn pose. A test video has been given in the format of google file id. Detection and huamn pose data will be saved in the format of json and will be saved in the output folder.
+This project detect the 2D and 3D dance pose data using Yolov7 and Mediapipe, respectively. A test video has been given in the format of google file id. 
+Huamn pose data will be saved in the format of json and will be saved in the output folder.
 
 If need to change another video, delete input folder videos and put new video under input folder. Note could solve multiple videos.
-
-Note: For plot_json file, only one person video can be plot.
 
 ## Getting Started
 Clone the repository.
@@ -46,18 +48,19 @@ In the configuration file (config/cfg.yaml), a test video has been gived which c
 
 Run the code
 ```
-python main.py --device [gpu/cpu]
+python main.py --device [gpu/cpu] --dim [2D/3D]
 ```
-The object dection and huamn pose estimation data will be saved in output file with the json format.
+- device DEVICE  cpu/0,1,2,3(gpu), default gpu
+- dim {2D,3D}    choose to extract 2D or 3D huamn pose data, default 3D
+
+The huamn pose estimation data will be saved in output file with the json format.
 <img src="images/object_human_pose_estimation.gif" width=100% height=250>
-
 Plot human pose with json file using matplotlib
-```
-python plot_json.py
-```
-<img src="images/result.gif" width=100% height=250>
 
+<img src="images/result2d.gif" width=100% height=250>
+<img src="images/result3d.gif" width=100% height=250>
 
 ## Reference
 - https://github.com/WongKinYiu/yolov7
 - https://github.com/SkalskiP/sport
+- https://github.com/google/mediapipe

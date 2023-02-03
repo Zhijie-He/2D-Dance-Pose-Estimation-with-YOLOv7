@@ -41,13 +41,13 @@ def run():
     json_name = [item for item in os.listdir(output_path) if item.split(".")[-1]=="json"]
     # get json full path
     EXTRACTED_DATA_PATH =  [os.path.join(output_path, item) for item in json_name]
-    for file_infex, json_path in enumerate(EXTRACTED_DATA_PATH):
-        video_name =  json_name[file_infex].split(".")[0]
+    
+    for file_index, json_path in enumerate(EXTRACTED_DATA_PATH):
+        video_name =  json_name[file_index].split(".")[0]
         print("#"*10, "processing video:", video_name, "#"*10)
         # create video frame folder
-        frames_path = os.path.join(current_path, "frames", video_name)
-        if not os.path.exists(frames_path):
-            os.makedirs(frames_path)
+        frames_path = os.path.join(output_path, "frames", video_name)
+        helper.makedirs(frames_path)
             
         # Load json data
         extracted_data = helper.load_extracted_data(json_path)

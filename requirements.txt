@@ -1,5 +1,6 @@
 absl-py==1.4.0
 asttokens==2.2.1
+attrs==22.2.0
 backcall==0.2.0
 beautifulsoup4==4.11.1
 boto3==1.26.55
@@ -14,6 +15,7 @@ decorator==5.1.1
 executing==1.2.0
 filelock==3.9.0
 fire==0.5.0
+flatbuffers==23.1.21
 fonttools==4.38.0
 gdown==4.6.0
 gitdb==4.0.10
@@ -32,12 +34,14 @@ Markdown==3.4.1
 MarkupSafe==2.1.2
 matplotlib==3.6.3
 matplotlib-inline==0.1.6
+mediapipe==0.9.1.0
 numpy==1.23.5
 nvidia-cublas-cu11==11.10.3.66
 nvidia-cuda-nvrtc-cu11==11.7.99
 nvidia-cuda-runtime-cu11==11.7.99
 nvidia-cudnn-cu11==8.5.0.96
 oauthlib==3.2.2
+opencv-contrib-python==4.7.0.68
 opencv-python==4.7.0.68
 packaging==23.0
 pandas==1.5.3
